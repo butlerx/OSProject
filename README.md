@@ -88,44 +88,58 @@ See the School of Computing's Statement on Plagiarism. See also DCU's Academic I
 
 #FAQ
 
-Q. I am not in a project team. What should I do?
+Q. I am not in a project team. What should I do? 
+
 A. E-mail me as soon as possible and I'll try to put you in touch with other students in the same position. If you leave e-mailing me too late I will not accept your submission and you will receive a mark of zero.
 
 Q. I was sick during the period we had to work on the assignment. Can I get an extension?
+
 A. Yes, as long as your request for an extension is accompanied by a medical cert covering the period in question.
 
 Q. I was sick during the period we had to work on the assignment but I did not visit a doctor so have no medical cert. Can I get an extension?
+
 A. Any request for an extension not accompanied by a medical cert will be refused.
 
 Q. What would a working solution look like?
+
 A. It would look like this. (Note this video does not demonstrate all of the extra credit features.)
 
 Q. Can you help us get started?
+
 A. Yes. See the resources section.
 
 Q. How will my solution be tested?
+
 A. I will look at the code. I will also run it on a lab machine. You may develop your solution on your laptop but you should verify it functions correctly on a lab machine running Linux in L101 before submission.
 
 Q. My solution is working on my laptop. However when I tested it ten minutes before the deadline on a machine in L101 it did not work properly. What can I do?
+
 A. Nothing. You should have tested your code earlier.
 
 Q. Can I use an ArrayBlockingQueue from the Java Collections Framework for my bounded buffer? Can I use an ArrayList?
+
 A. No. You must implement your own bounded buffer using an array. That is why I listed some suggested variables.
 
 Q. Should I use an applet-based approach?
+
 A. You must use the applet-based approach. See the resources section. Using an applet will make it easier to handle user commands such as exit, pause, mute, etc.
 
 Q. Can I use semaphores, locks, etc.?
+
 A. No. You may only use synchronized, wait, notify and notifyAll.
 
 Q. Can I use thread.stop to terminate my threads?
+
 A. No. thread.stop is a deprecated method (i.e. Oracle does not recommend you use it because it does not work properly).
 
 Q. I'm having trouble terminating my threads. What should I do?
+
 A. Your priority should be, first off, to solve the bounded buffer problem and produce a working audio player applet. You will get marks for doing so. After that you can move on to supporting the exit command. After that you can move on to adding further commands for the extra credit.
+
 I have a different question
 
 E-mail me.
+
 #How to submit
 
 Create the following directory in one team member's Linux account:
