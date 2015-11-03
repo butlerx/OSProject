@@ -171,6 +171,37 @@ class BoundedBuffer {
   }
 }
 
+class Producer implements Runnable
+{
+	
+	public BoundedBuffer buffer;
+	public AudioInputStream s;
+	byte[] temp;
+	
+	public Producer(BoundedBuffer buffer, AudioInputStream s)
+	{
+		this.buffer = buffer;
+		this.s = s;
+		AudioFormat format = s.getFormat();
+		int chunkSize = (int) (format.getChannels() * format.getSampleRate() * format.getSampleSizeInBits() / 8);
+		temp = new byte[chunkSize];
+	}
+	
+	public void run()
+	{
+		try 
+		{
+			while(true)
+			{
+				s.read(temp);
+				//s.read(temp);
+				buffer.insertChunk(temp);
+			}	
+
+		} catch (IOException e) { }
+	}
+}
+
 public class StudentPlayerApplet extends Applet {
   private static final long serialVersionUID = 1L;
 	public void init() {
