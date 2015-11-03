@@ -24,8 +24,31 @@ class Player extends Panel implements Runnable {
 
     textfield.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-		  textarea.append("You said: " + e.getActionCommand() + "\n");
-		  textfield.setText("");
+        if(e.getActionCommand() == "x") {
+          //system should exit
+        }
+        else if(e.getActionCommand() == "q") {
+          //raises the volume
+        }
+        else if(e.getActionCommand() == "a") {
+          //lowers the volume
+        }
+        else if(e.getActionCommand() == "p") {
+          //pauses playback
+        }
+        else if(e.getActionCommand() == "r") {
+          //resumes playback
+        }
+        else if(e.getActionCommand() == "m") {
+          //mutes audio
+        }
+        else if(e.getActionCommand() == "u") {
+          //unmutes audio
+        }
+        else {
+    		  textarea.append("You said: " + e.getActionCommand() + "\n");
+    		  textfield.setText("");
+        }
       }
     });
 
@@ -44,6 +67,10 @@ class Player extends Panel implements Runnable {
   	  if (!AudioSystem.isLineSupported(info)) {
         throw new UnsupportedAudioFileException();
       }
+
+      //BoundedBuffer buffer = new BoundedBuffer(10);
+      //Thread cthread = new Thread(new Consumer(buffer));
+      //Thread pthread = new Thread(new Producer(buffer));
 
   	  int oneSecond = (int) (format.getChannels() * format.getSampleRate() *
         format.getSampleSizeInBits() / 8);
