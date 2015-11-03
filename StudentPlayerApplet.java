@@ -197,8 +197,8 @@ class Producer implements Runnable {
 
 public class StudentPlayerApplet extends Applet {
   private static final long serialVersionUID = 1L;
-	public void init() {
-		setLayout(new BorderLayout());
-		add(BorderLayout.CENTER, new Player(getParameter("file")));
-	}
+  public void init() {
+    setLayout(new BorderLayout());
+    add(BorderLayout.CENTER, new Player(getParameter("file")));
+  }
 }
