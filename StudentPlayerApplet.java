@@ -191,7 +191,7 @@ class Producer implements Runnable {
         //s.read(temp);
         buffer.insertChunk(temp);
       }
-    } catch (InterruptedException e) { }
+    } catch (IOException e) { }
   }
 }
 
