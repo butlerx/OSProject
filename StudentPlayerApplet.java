@@ -11,7 +11,7 @@ class Player extends Panel implements Runnable {
   private Font font;
   private String filename;
 
-  public Player(String filename){
+  public Player(String filename) { //constuctor for the Player class
 
     font = new Font(Font.SANS_SERIF, Font.PLAIN, 12);
     textfield = new TextField();
@@ -71,6 +71,23 @@ class Player extends Panel implements Runnable {
   	    System.exit(1);
     }
   }
+}
+
+class BoundedBuffer {
+  private int nextIn; //pointer to the next available open index
+  private int nextOut;  //pointer to the next audio chunk to be read
+  private int size; //size you want the buffer to be
+  private boolean roomAvailable;  //true when the buffer has at least one free slot
+  private boolean dataAvailable;  //true when the buffer has at least one full slot
+
+  public BoundedBuffer(int size) {  //initialzes an empty buffer
+    this.size = size;
+    nextIn = 0;
+    nextOut = 0;
+    roomAvailable = True;
+    dataAvailable = False;
+  }
+  private byte[][] buffer = new byte[size][]; //array of 1 second audio chunks
 }
 
 public class StudentPlayerApplet extends Applet {
