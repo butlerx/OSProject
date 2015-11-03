@@ -76,6 +76,8 @@ class Player extends Panel implements Runnable {
 class BoundedBuffer {
   private int nextIn; //pointer to the next available open index
   private int nextOut;  //pointer to the next audio chunk to be read
+  private int ins;  //counter of chunks inserted
+  private int outs; //counter of chunks read
   private int size; //size you want the buffer to be
   private boolean roomAvailable;  //true when the buffer has at least one free slot
   private boolean dataAvailable;  //true when the buffer has at least one full slot
@@ -84,10 +86,62 @@ class BoundedBuffer {
     this.size = size;
     nextIn = 0;
     nextOut = 0;
-    roomAvailable = True;
-    dataAvailable = False;
+    ins = 0;
+    outs = 0;
+    roomAvailable = true;
+    dataAvailable = false;
   }
   private byte[][] buffer = new byte[size][]; //array of 1 second audio chunks
+
+  public synchronized void insertChunk(byte [] chunk){ //inserts a single audio chunk into the buffer
+    try {
+      while(!roomAvailable){
+        wait();
+      }
+      for(int i = 0; i < chunk.length; i++) {
+        buffer[nextIn][i] = chunk[i];
+      }
+      nextIn = (nextIn++)%size;
+      ins++;
+      dataAvailable = true;
+      if(ins - outs >= size) {
+        roomAvailable = false;
+      }
+      if(!roomAvailable) {
+        notifyAll();
+      }
+    } catch(InterruptedException e) {
+        System.out.println("Producer Failed");
+        e.printStackTrace();
+        System.exit(1);
+    }
+  }
+
+  public synchronized byte[] removeChunk(){ //returns a single audio chunk from the buffer
+    byte [] chunk = new byte [buffer[nextOut].length];
+    try {
+      while(!dataAvailable) {
+        wait();
+      }
+      for(int i = 0; i < chunk.length; i++) {
+        chunk [i] = buffer[nextOut][i];
+      }
+      nextOut = (nextOut++)%size;
+      outs++;
+      roomAvailable = true;
+      if(ins - outs == 0) {
+        dataAvailable = false;
+      }
+      if(!dataAvailable) {
+        notifyAll();
+      }
+    } catch(InterruptedException e) {
+      System.out.println("Consumer Failed");
+      e.printStackTrace();
+      System.exit(1);
+    }
+    return chunk;
+  }
 }
 
 public class StudentPlayerApplet extends Applet {
