@@ -135,7 +135,6 @@ class Player extends Panel implements Runnable{
       public void actionPerformed(ActionEvent e){
         textarea.append("You said: " + e.getActionCommand() + "\n");
         switch (e.getActionCommand()){
-        {
         case "x":
           producerThread.interrupt();
           line.flush();
