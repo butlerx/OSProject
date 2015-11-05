@@ -156,7 +156,6 @@ class Player extends Panel implements Runnable
 				  line.stop();
 				  line.close();
 				  consumerThread.interrupt();
-                                  wait();
 				  System.out.println("Progam exiting.");
 				  System.exit(0);
 				  break;
