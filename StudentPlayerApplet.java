@@ -5,40 +5,35 @@ import java.awt.event.*;
 import java.io.*;
 
 class Buffer{
+  private int size;
   private int nextIn = 0;
   private int nextOut = 0;
-  //int size;
   private int occupied = 0;
   private int chunkSize;
-  //int ins;
-  //int outs;
   private boolean dataAvailable = false;
   private boolean roomAvailable = true;
 
   private byte[][] audioChunk;
 
-  public Buffer(AudioFormat format){
-  chunkSize = (int) (format.getChannels() * format.getSampleRate() * format.getSampleSizeInBits() / 8);
-  audioChunk = new byte[chunkSize][10];
-}
+  public Buffer(AudioFormat format, int size){
+    chunkSize = (int) (format.getChannels() * format.getSampleRate() * format.getSampleSizeInBits() / 8);
+    audioChunk = new byte[chunkSize][size];
+    this.size = size;
+  }
 
   public synchronized void insertChunk(byte[] temp) throws InterruptedException{
       while(roomAvailable == false){
       wait();
     }
-  //SourceDataLine line = (SourceDataLine) AudioSystem.getLine(info);
-  //>line.open(format);
-  //>line.start();
     System.out.println("chunk inserting " + nextIn);
     //insert a chunk
     audioChunk[nextIn] = temp;
-    //s.read(audioChunk[nextIn]);
     //move nextin forward
-    nextIn = (nextIn + 1)%10;
+    nextIn = (nextIn + 1)%size;
     //say there is data available
     dataAvailable = true;
     occupied++;
-    if(occupied == 9)
+    if(occupied == size)
     roomAvailable = false;
     notifyAll();
   }
@@ -51,7 +46,7 @@ class Buffer{
     //read a chunk
     byte[] temp = audioChunk[nextOut];
     //move nextout forward
-    nextOut = (nextOut + 1)%10;
+    nextOut = (nextOut + 1)%size;
     //say there is room available
     roomAvailable = true;
     occupied--;
@@ -184,7 +179,7 @@ class Player extends Panel implements Runnable{
       line = (SourceDataLine) AudioSystem.getLine(info);
       line.open(format);
 
-      buffer = new Buffer(format);
+      buffer = new Buffer(format, 10);
 
       producerThread = new Thread(new Producer(buffer, s));
       consumerThread = new Thread(new Consumer(buffer, line, format));
