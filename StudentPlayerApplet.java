@@ -12,6 +12,7 @@ class Buffer{
   private int chunkSize;
   private boolean dataAvailable = false;
   private boolean roomAvailable = true;
+  private boolean finished = false;
 
   private byte[][] audioChunk;
 
@@ -55,6 +56,14 @@ class Buffer{
     notifyAll();
     return temp;
   }
+
+  public synchronized void finish() throws InterruptedException {
+    finished = true;
+  }
+
+  public synchronized boolean finished() throws InterruptedException {
+    return finished;
+  }
 }
 
 class Producer implements Runnable{
@@ -74,14 +83,18 @@ class Producer implements Runnable{
 
   public void run(){
     try{
-      while(true){
+      while(s.available() > 0){
         byte[] temp = new byte[chunkSize];
         s.read(temp);
         buffer.insertChunk(temp);
       }
-
-    } catch (InterruptedException b) {System.out.println("Producer shutting down"); return; }
-    catch (IOException e) {}
+      buffer.finish();
+    } catch (IOException e) {}
+    catch (InterruptedException b) {
+    } finally {
+        System.out.println("Producer shutting down");
+        return;
+    }
   }
 }
 
@@ -97,10 +110,14 @@ class Consumer implements Runnable{
 
   public void run(){
     try{
-      while(true){
+      while(!buffer.finished()){
         line.write(buffer.removeChunk(), 0, chunkSize);
       }
-    } catch (InterruptedException e) {System.out.println("Consumer shutting down"); return; }
+    } catch (InterruptedException e) {
+    } finally {
+      System.out.println("Consumer shutting down");
+      return;
+    }
   }
 }
 
@@ -136,6 +153,10 @@ class Player extends Panel implements Runnable{
           line.stop();
           line.close();
           consumerThread.interrupt();
+          try { //force thread shutdown order
+            producerThread.join();
+            consumerThread.join();
+          }catch (InterruptedException f) {}
           System.out.println("Progam exiting.");
           System.exit(0);
           break;
