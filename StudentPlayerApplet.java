@@ -209,6 +209,9 @@ class Player extends Panel implements Runnable{
       consumerThread.start();
 
       line.start();
+      while(consumerThread.isAlive()) {}
+      System.out.println("Progam exiting.");
+      System.exit(0);
     }
 
     catch (UnsupportedAudioFileException e ){
@@ -229,6 +232,16 @@ class Player extends Panel implements Runnable{
     System.exit(1);
     }
   }
+}
+
+class OneSecondChunk {
+  private int chunkSize;
+  private byte [] chunk;
+
+  public OneSecondChunk(int c){
+    chunk = new byte [chunkSize];
+  }
+  
 }
 
 public class StudentPlayerApplet extends Applet{
