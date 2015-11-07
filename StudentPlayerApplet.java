@@ -131,6 +131,9 @@ class Player extends Panel implements Runnable{
   private Thread consumerThread;
   private Buffer buffer;
   private SourceDataLine line;
+	private FloatControl gainControl;
+	private float volume = (float) 0.0;
+	private boolean muted = false;
 
   public Player(String filename)
   {
@@ -162,21 +165,44 @@ class Player extends Panel implements Runnable{
           break;
         case "q":
           //raise volume
+					if(!muted){
+						if(volume < (float) 6)
+							volume = volume + (float) 1.0;
+						textarea.append("volume set to " + volume);
+						gainControl.setValue(volume);
+					}
           break;
         case "a":
           //lower volume
+					if(!muted){
+						if(volume > (float) -80.0)
+							volume = volume - (float) 1.0;
+						textarea.append("volume set to " + volume);
+						gainControl.setValue(volume);
+					}
           break;
         case "p":
           //pause playback
+					line.stop();
+					//WARNING: THIS KILLS THE PRODUCER
           break;
         case "r":
           //resume playback
+					line.start();
           break;
         case "m":
           //mute audio
+					if(!muted){
+						gainControl.setValue((float) -80.0);
+						muted = true;
+					}
           break;
         case "u":
           //unmute
+					if(muted){
+						gainControl.setValue(volume);
+						muted = false;
+					}
           break;
         }
         textfield.setText("");
@@ -199,6 +225,9 @@ class Player extends Panel implements Runnable{
       }
       line = (SourceDataLine) AudioSystem.getLine(info);
       line.open(format);
+			
+			gainControl = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
+			//gainControl.setValue(-10.0f);
 
       buffer = new Buffer(format, 10);
 
