@@ -160,8 +160,6 @@ class Player extends Panel implements Runnable{
             producerThread.join();
             consumerThread.join();
           }catch (InterruptedException f) {}
-          System.out.println("Progam exiting.");
-          System.exit(0);
           break;
         case "q":
           //raise volume
@@ -183,12 +181,13 @@ class Player extends Panel implements Runnable{
           break;
         case "p":
           //pause playback
-					line.stop();
+					//line.stop();
 					//WARNING: THIS KILLS THE PRODUCER
           break;
         case "r":
+          //consumerThread.start();
           //resume playback
-					line.start();
+					//line.start();
           break;
         case "m":
           //mute audio
@@ -225,7 +224,7 @@ class Player extends Panel implements Runnable{
       }
       line = (SourceDataLine) AudioSystem.getLine(info);
       line.open(format);
-			
+
 			gainControl = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
 			//gainControl.setValue(-10.0f);
 
@@ -263,14 +262,13 @@ class Player extends Panel implements Runnable{
   }
 }
 
-class OneSecondChunk {
+class OneSecondChunk { //currently unused, initial framework for object that will hold 1 second of audio
   private int chunkSize;
   private byte [] chunk;
 
   public OneSecondChunk(int c){
     chunk = new byte [chunkSize];
   }
-  
 }
 
 public class StudentPlayerApplet extends Applet{
