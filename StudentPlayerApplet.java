@@ -112,7 +112,7 @@ class Consumer implements Runnable{
   public void run(){
     try{
       while(!buffer.finished()){
-        while(playing.get()){
+        if(playing.get()){
           line.write(buffer.removeChunk(), 0, chunkSize);
         }
       }
