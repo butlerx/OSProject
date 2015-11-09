@@ -170,7 +170,7 @@ class Player extends Panel implements Runnable{
 	  if(!muted){
 	    if(volume < (float) 6)
 	      volume = volume + (float) 1.0;
-	    textarea.append("volume set to " + volume);
+	    textarea.append("volume set to " + volume + "\n");
 	    gainControl.setValue(volume);
 	  }
           break;
@@ -179,23 +179,30 @@ class Player extends Panel implements Runnable{
           if(!muted){
 	    if(volume > (float) -80.0)
 	      volume = volume - (float) 1.0;
-	    textarea.append("volume set to " + volume);
+	    textarea.append("volume set to " + volume + "\n");
 	    gainControl.setValue(volume);
 	  }
           break;
         case "p":
           //pause playback
-          playing.set(false);
+          if(playing.get()){
+            playing.set(false);
+            textarea.append("playback paused \n");
+          }
           break;
         case "r":
           //resume playback
-          playing.set(true);
+          if(!playing.get()){
+            playing.set(true);
+            textarea.append("playback resumed \n");
+          }
           break;
         case "m":
           //mute audio
 	  if(!muted){
             gainControl.setValue((float) -80.0);
             muted = true;
+            textarea.append("playback muted \n");
 	  }
           break;
         case "u":
@@ -203,6 +210,7 @@ class Player extends Panel implements Runnable{
 	  if(muted){
 	    gainControl.setValue(volume);
 	    muted = false;
+      textarea.append("playback unmuted \n");
 	  }
           break;
         }
