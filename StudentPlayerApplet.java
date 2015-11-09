@@ -34,8 +34,9 @@ class Buffer{
     //say there is data available
     dataAvailable = true;
     occupied++;
-    if(occupied == size)
-    roomAvailable = false;
+    if(occupied == size) {
+      roomAvailable = false;
+    }
     notifyAll();
   }
 
@@ -51,8 +52,9 @@ class Buffer{
     //say there is room available
     roomAvailable = true;
     occupied--;
-    if(occupied == 0)
-    dataAvailable = false;
+    if(occupied == 0){
+      dataAvailable = false;
+    }
     notifyAll();
     return temp;
   }
@@ -69,7 +71,6 @@ class Buffer{
 class Producer implements Runnable{
   private Buffer buffer;
   private AudioInputStream s;
-  private byte[] temp;
   private int chunkSize;
 
   public Producer(Buffer buffer, AudioInputStream s){
@@ -77,7 +78,6 @@ class Producer implements Runnable{
     this.s = s;
     AudioFormat format = s.getFormat();
     int chunkSize = (int) (format.getChannels() * format.getSampleRate() * format.getSampleSizeInBits() / 8);
-    temp = new byte[chunkSize];
     this.chunkSize = chunkSize;
   }
 
