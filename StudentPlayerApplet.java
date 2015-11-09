@@ -27,7 +27,6 @@ class Buffer{
       while(roomAvailable == false){
       wait();
     }
-    System.out.println("chunk inserting " + nextIn);
     //insert a chunk
     audioChunk[nextIn] = temp;
     //move nextin forward
@@ -45,7 +44,6 @@ class Buffer{
       while(dataAvailable == false){
       wait();
     }
-    System.out.println("chunk removing " + nextOut);
     //read a chunk
     byte[] temp = audioChunk[nextOut];
     //move nextout forward
@@ -169,47 +167,43 @@ class Player extends Panel implements Runnable{
           break;
         case "q":
           //raise volume
-					if(!muted){
-						if(volume < (float) 6)
-							volume = volume + (float) 1.0;
-						textarea.append("volume set to " + volume);
-						gainControl.setValue(volume);
-					}
+	  if(!muted){
+	    if(volume < (float) 6)
+	      volume = volume + (float) 1.0;
+	    textarea.append("volume set to " + volume);
+	    gainControl.setValue(volume);
+	  }
           break;
         case "a":
           //lower volume
-					if(!muted){
-						if(volume > (float) -80.0)
-							volume = volume - (float) 1.0;
-						textarea.append("volume set to " + volume);
-						gainControl.setValue(volume);
-					}
+          if(!muted){
+	    if(volume > (float) -80.0)
+	      volume = volume - (float) 1.0;
+	    textarea.append("volume set to " + volume);
+	    gainControl.setValue(volume);
+	  }
           break;
         case "p":
-          playing.set(false);
           //pause playback
-					//line.stop();
-					//WARNING: THIS KILLS THE PRODUCER
+          playing.set(false);
           break;
         case "r":
-          playing.set(true);
-          //consumerThread.start();
           //resume playback
-					//line.start();
+          playing.set(true);
           break;
         case "m":
           //mute audio
-					if(!muted){
-						gainControl.setValue((float) -80.0);
-						muted = true;
-					}
+	  if(!muted){
+            gainControl.setValue((float) -80.0);
+            muted = true;
+	  }
           break;
         case "u":
           //unmute
-					if(muted){
-						gainControl.setValue(volume);
-						muted = false;
-					}
+	  if(muted){
+	    gainControl.setValue(volume);
+	    muted = false;
+	  }
           break;
         }
         textfield.setText("");
@@ -233,8 +227,7 @@ class Player extends Panel implements Runnable{
       line = (SourceDataLine) AudioSystem.getLine(info);
       line.open(format);
 
-			gainControl = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
-			//gainControl.setValue(-10.0f);
+      gainControl = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
 
       buffer = new Buffer(format, 10);
 
