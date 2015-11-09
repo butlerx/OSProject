@@ -263,15 +263,6 @@ class Player extends Panel implements Runnable{
   }
 }
 
-class OneSecondChunk { //currently unused, initial framework for object that will hold 1 second of audio
-  private int chunkSize;
-  private byte [] chunk;
-
-  public OneSecondChunk(int c){
-    chunk = new byte [chunkSize];
-  }
-}
-
 public class StudentPlayerApplet extends Applet{
   private static final long serialVersionUID = 1L;
   public void init(){
