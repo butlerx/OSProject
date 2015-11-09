@@ -3,6 +3,7 @@ import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 class Buffer{
   private int size;
@@ -102,7 +103,9 @@ class Consumer implements Runnable{
   private Buffer buffer;
   private SourceDataLine line;
   private int chunkSize;
-  public Consumer(Buffer buffer, SourceDataLine line, AudioFormat format){
+  public AtomicBoolean playing;
+  public Consumer(Buffer buffer, SourceDataLine line, AudioFormat format, AtomicBoolean b){
+    this.playing = b;
     this.buffer = buffer;
     this.line = line;
     this.chunkSize = (int) (format.getChannels() * format.getSampleRate() * format.getSampleSizeInBits() / 8);
@@ -111,7 +114,9 @@ class Consumer implements Runnable{
   public void run(){
     try{
       while(!buffer.finished()){
-        line.write(buffer.removeChunk(), 0, chunkSize);
+        while(playing.get()){
+          line.write(buffer.removeChunk(), 0, chunkSize);
+        }
       }
     } catch (InterruptedException e) {
     } finally {
@@ -134,6 +139,7 @@ class Player extends Panel implements Runnable{
 	private FloatControl gainControl;
 	private float volume = (float) 0.0;
 	private boolean muted = false;
+  public AtomicBoolean playing = new AtomicBoolean(true);
 
   public Player(String filename)
   {
@@ -180,11 +186,13 @@ class Player extends Panel implements Runnable{
 					}
           break;
         case "p":
+          playing.set(false);
           //pause playback
 					//line.stop();
 					//WARNING: THIS KILLS THE PRODUCER
           break;
         case "r":
+          playing.set(true);
           //consumerThread.start();
           //resume playback
 					//line.start();
@@ -231,7 +239,7 @@ class Player extends Panel implements Runnable{
       buffer = new Buffer(format, 10);
 
       producerThread = new Thread(new Producer(buffer, s));
-      consumerThread = new Thread(new Consumer(buffer, line, format));
+      consumerThread = new Thread(new Consumer(buffer, line, format, playing));
 
       producerThread.start();
       consumerThread.start();
