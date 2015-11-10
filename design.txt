@@ -19,8 +19,6 @@ producer - run
 consumer - run
   while the buffer.finished is false byte is removed from the buffer and written to the audio stream.
 
-player action performed
-  Not sure on this one
 
 player - run
   A new AudioInputStream is created.  ... A new buffer, producer and consumer are created and the producer and consumer threads are started.
@@ -36,4 +34,6 @@ player - actionPerformed
   If an a is pressed it first checks if the boolean muted is not true, if not and the value of volume is > 80.
   The volume is decreased by 1 and a note that the volume has decreased and the volume is set.
 
-  
+  if a p is pressed i playing.get is called which returns the boolean value of playing. 
+
+
