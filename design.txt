@@ -1,0 +1,28 @@
+Cian butler - 13373596
+Eanna Byrne - 13763861
+Daire O'Bruachail - 13479738
+Lorcan Boyle - 11411278
+
+insertChunk
+  This takes in a arguement of type byte[]. If roomavailable is False the method will wait until roomAvailable is True. it inserts the byte[] into audioChunk at
+the posision of nextIn. nextIn is then incremented by 1 unless nextIn is the same as size then it will set it to zero. since audio has been entered dataAvailable
+is set to True. If occupied is the same as size roomAvailble is set back to False.
+
+removeChunk
+  First checks if there is dataAvailable to remove if false it waits. temp is set to the next chunk to be read. nextOut is incremented by 1 and % by size.
+room Availablt is set back to true. occupied is decremented  and if it equals 0 dataAvailable is set to false. all threads are notified and temp is returned,
+
+producer - run
+  whhile s.available it greater than 0. A byte is read in by the stream and inserted into thebuffer. once this is done the buffer is closed and the thread is 
+  killed.
+
+consumer - run
+  while the buffer.finished is false byte is removed from the buffer and written to the audio stream.
+
+player action performed
+  Not sure on this one
+
+player - run
+  A new AudioInputStream is created.  ... A new buffer, producer and consumer are created and the producer and consumer threads are started.
+
+
