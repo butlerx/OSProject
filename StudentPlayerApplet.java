@@ -27,11 +27,10 @@ class Buffer{
       while(roomAvailable == false){
       wait();
     }
-    //insert a chunk
+    //insert a chunk into buffer
     audioChunk[nextIn] = temp;
     //move nextin forward
     nextIn = (nextIn + 1)%size;
-    //say there is data available
     dataAvailable = true;
     occupied++;
     if(occupied == size) {
@@ -48,7 +47,6 @@ class Buffer{
     byte[] temp = audioChunk[nextOut];
     //move nextout forward
     nextOut = (nextOut + 1)%size;
-    //say there is room available
     roomAvailable = true;
     occupied--;
     if(occupied == 0){
@@ -57,11 +55,11 @@ class Buffer{
     notifyAll();
     return temp;
   }
-
+  //set the finished variable to true indicating there is no more data to read
   public synchronized void finish() throws InterruptedException {
     finished = true;
   }
-
+  //check the finished variable to see if there willl be mroe data inserted
   public synchronized boolean finished() throws InterruptedException {
     return finished;
   }
@@ -134,9 +132,9 @@ class Player extends Panel implements Runnable{
   private Thread consumerThread;
   private Buffer buffer;
   private SourceDataLine line;
-	private FloatControl gainControl;
-	private float volume = (float) 0.0;
-	private boolean muted = false;
+  private FloatControl gainControl;
+  private float volume = (float) 0.0;
+  private boolean muted = false;
   public AtomicBoolean playing = new AtomicBoolean(true);
 
   public Player(String filename)
@@ -155,6 +153,7 @@ class Player extends Panel implements Runnable{
         textarea.append("You said: " + e.getActionCommand() + "\n");
         switch (e.getActionCommand()){
         case "x":
+          //closes the program
           producerThread.interrupt();
           line.flush();
           line.stop();
@@ -208,7 +207,7 @@ class Player extends Panel implements Runnable{
 	  }
           break;
         case "u":
-          //unmute
+          //unmute audio
 	  if(muted){
 	    gainControl.setValue(volume);
 	    muted = false;
