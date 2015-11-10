@@ -1,34 +1,34 @@
 Cian butler - 13373596
 Eanna Byrne - 13763861
-Daire O'Bruachail - 13479738
 Lorcan Boyle - 11411278
+Daire O'Bruachail - 13479738
 
 insertChunk
-  This takes in a arguement of type byte[]. If roomavailable is False the method will wait until roomAvailable is True. it inserts the byte[] into audioChunk at
-the posision of nextIn. nextIn is then incremented by 1 unless nextIn is the same as size then it will set it to zero. since audio has been entered dataAvailable
+  This takes in a arguement of type byte[]. If roomavailable is False the method will wait until roomAvailable is True. It inserts the byte[] into audioChunk at
+the posision of nextIn. nextIn is then incremented by 1 unless nextIn is the same as size then it will set it to zero. Since audio has been entered dataAvailable
 is set to True. If occupied is the same as size roomAvailble is set back to False.
 
 removeChunk
   First checks if there is dataAvailable to remove if false it waits. temp is set to the next chunk to be read. nextOut is incremented by 1 and % by size.
-room Availablt is set back to true. occupied is decremented  and if it equals 0 dataAvailable is set to false. all threads are notified and temp is returned,
+room Availablt is set back to true. occupied is decremented  and if it equals 0 dataAvailable is set to false. All threads are notified and temp is returned,
 
 producer - run
-  whhile s.available it greater than 0. A byte is read in by the stream and inserted into thebuffer. once this is done the buffer is closed and the thread is
+  While s.available it greater than 0, A byte is read in by the stream and inserted into thebuffer. Once this is done the buffer is closed and the thread is
   killed.
 
 consumer - run
-  while the buffer.finished is false byte is removed from the buffer and written to the audio stream.
+  While the buffer.finished is false byte is removed from the buffer and written to the audio stream.
 
 player action performed
   Not sure on this one
 
 player - run
-  A new AudioInputStream is created.  ... A new buffer, producer and consumer are created and the producer and consumer threads are started.
+  A new AudioInputStream is created. A new buffer, producer and consumer are created and the producer and consumer threads are started.
 
 player - actionPerformed
-  the textfield in the appplet is waits for input to be entered. When a letter is entered it is checked against the switch statement.
-  if x is entered an interupt is sent to the producerThread to shut it down.
-  The buffer is then flushed of audio, stoped from taking more, and closed then an  interupt is sent to the consumer to shut that down.
+  The textfield in the appplet is waits for input to be entered. When a letter is entered it is checked against the switch statement.
+  If x is entered an interupt is sent to the producerThread to shut it down.
+  The buffer is then flushed of audio, stoped from taking more, and closed then an interupt is sent to the consumer to shut that down.
 
   If a q is pressed it first checks if the boolean muted is not true, if not and the value of volume is < 6.
   The volume is increased by 1 and a note that the volume has increased and the volume is set.
@@ -36,4 +36,3 @@ player - actionPerformed
   If an a is pressed it first checks if the boolean muted is not true, if not and the value of volume is > 80.
   The volume is decreased by 1 and a note that the volume has decreased and the volume is set.
 
-  
