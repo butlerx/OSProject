@@ -168,19 +168,21 @@ class Player extends Panel implements Runnable{
         case "q":
           //raise volume
 	  if(!muted){
-	    if(volume < (float) 6)
+	    if(volume < (float) 6){
 	      volume = volume + (float) 1.0;
-	    textarea.append("volume set to " + volume + "\n");
-	    gainControl.setValue(volume);
+	      textarea.append("volume set to " + volume + "\n");
+	      gainControl.setValue(volume);
+            }
 	  }
           break;
         case "a":
           //lower volume
           if(!muted){
-	    if(volume > (float) -80.0)
+	    if(volume > (float) -80.0){
 	      volume = volume - (float) 1.0;
-	    textarea.append("volume set to " + volume + "\n");
-	    gainControl.setValue(volume);
+	      textarea.append("volume set to " + volume + "\n");
+	      gainControl.setValue(volume);
+            }
 	  }
           break;
         case "p":
@@ -210,14 +212,13 @@ class Player extends Panel implements Runnable{
 	  if(muted){
 	    gainControl.setValue(volume);
 	    muted = false;
-      textarea.append("playback unmuted \n");
+            textarea.append("playback unmuted \n");
 	  }
           break;
         }
         textfield.setText("");
       }
     });
-
     this.filename = filename;
     new Thread(this).start();
   }
