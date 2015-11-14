@@ -1,0 +1,14 @@
+Cian butler - 13373596
+Eanna Byrne - 13763861
+Lorcan Boyle - 11411278
+Daire O'Bruachail - 13479738
+
+
+Our program implements a bounded buffer than takes in ten seconds of audio data. It has two methods that affect the buffer contents, insertChunk and removeChunk.
+These methods are syncronized so that they cannot affect the buffer at the same time. (mutual exclusion)
+
+There is a producer class which reads audio data from the file and writes to the buffer as long as there is data available to write.
+There is a consumer class which reads from the buffer and writes to the audio device as long as none of the flags are set which prevent this.
+There are tests for different keyboard keys which will affect playback depending on what is pressed.
+Upon closing each thread outputs to the terminal that it is shutting down.
+
