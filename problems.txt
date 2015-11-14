@@ -1,7 +1,0 @@
-Cian butler - 13373596
-Eanna Byrne - 13763861
-Daire O'Bruachail - 13479738
-Lorcan Boyle - 11411278
-
-When p is pressed to pause there is a one second delay on pausing the audio.
-The buffer uses a multi demisional array instead of an array of objects to hold 1 second audio
