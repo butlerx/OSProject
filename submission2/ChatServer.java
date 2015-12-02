@@ -74,10 +74,6 @@ class ClientReader implements Runnable{
 			//add the next input to the buffer
 			while ((inputLine = in.readLine()) != null) {
 				buffer.add(user + ": " + inputLine);
-				if (socket.isClosed()){
-					System.out.println("ClientReader shuting down");
-					return;//Shut down this thread, remove the socket and username
-				}
 			}
 		}catch(IOException c){
 			System.out.println("ClientReader shuting down");
