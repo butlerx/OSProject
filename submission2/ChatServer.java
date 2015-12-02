@@ -67,13 +67,15 @@ class ServerThread implements Runnable{
 	
 	public void run(){
 		try{
+			//username = in.readline
+			//system.out.println(username);
 			String inputLine;
 			out.println("Connected");
 
 			while ((inputLine = in.readLine()) != null) {
 				buffer.add(inputLine);
 				if (inputLine.equals("Quit"))
-					break;
+					break; //Shut down the Thread
 			}
 		} catch(IOException|InterruptedException e) {System.out.println("Error running serverthread");}
 	}
@@ -81,10 +83,10 @@ class ServerThread implements Runnable{
 
 class Consumer implements Runnable{
 	private Buffer buffer;
-	private Vector clients;
+	private Vector<Socket> clients;
 	boolean running = true;
 	
-	public Consumer(Buffer buffer, Vector clients){
+	public Consumer(Buffer buffer, Vector<Socket> clients){
 		this.buffer = buffer;	
 		this.clients = clients;
 	}
@@ -95,9 +97,10 @@ class Consumer implements Runnable{
 			{
 				String message = buffer.remove();
 				for(int i = 0; i < clients.size(); i++){
-					Socket temp = (Socket)clients.elementAt(i);
+					Socket temp = clients.elementAt(i);
 					PrintWriter out = new PrintWriter(temp.getOutputStream(), true);
 					out.println(message);
+					System.out.println("Somebody said: " + message);
 				}
 				//if there is a message
 				//extract message
@@ -112,24 +115,23 @@ public class ChatServer
 {
 	public static void main(String [] args)
 	{
-		int portNumber = 4444; //temporary port number til I figure shit out
+		//int portNumber = 4444; //temporary port number til I figure shit out
 		boolean running = true;
 		
 		Buffer buffer = new Buffer(10);
-		//ArrayList<Thread> threadList = new ArrayList<>();
-		Vector clients = new Vector();
+		Vector<Socket> clients = new Vector<Socket>();
 		
 		Thread consumer = new Thread(new Consumer(buffer, clients));
 		consumer.start();
 		try{
-			
-			ServerSocket server = new ServerSocket(portNumber);
+			ServerSocket server = new ServerSocket(7777, 0, InetAddress.getByName(null));
+			//ServerSocket server = new ServerSocket(portNumber);
 			while(running)
 			{
 				Socket clientSocket = server.accept();
 				Thread temp = new Thread(new ServerThread(clientSocket, buffer));
 				temp.start();
-				clients.add(temp);
+				clients.add(clientSocket);
 			}
 		}catch(IOException b){System.out.println("Error in main");}
 		
