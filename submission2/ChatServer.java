@@ -49,33 +49,36 @@ class Buffer{
 class ServerThread implements Runnable{
 	private Socket socket = null;
 	private Buffer buffer;
+	private Vector<String> usernames;
 	PrintWriter out;
 	BufferedReader in;
 	
-	public ServerThread(Socket socket, Buffer buffer){ //this is a producer
+	public ServerThread(Socket socket, Buffer buffer, Vector<String> usernames){ //this is a producer
 		this.socket = socket;
 		this.buffer = buffer;
+		this.usernames = usernames;
 		try{
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		}catch(IOException b){System.out.println("Error creating printwriter or bufferedreader");}
 	}
 	
-	public void write(String output){
+	/*public void write(String output){
 		out.println(output);
-	}
+	}*/
 	
 	public void run(){
 		try{
-			//username = in.readline
-			//system.out.println(username);
+			String user = in.readLine();
+			usernames.add(user);
+			System.out.println(user + " has connected.");
 			String inputLine;
-			out.println("Connected");
+			out.println(user + " Connected");
 
 			while ((inputLine = in.readLine()) != null) {
 				buffer.add(inputLine);
-				if (inputLine.equals("Quit"))
-					break; //Shut down the Thread
+				//if (inputLine.equals("Quit"))
+					//Thread.stop(); //break; //Shut down the Thread
 			}
 		} catch(IOException|InterruptedException e) {System.out.println("Error running serverthread");}
 	}
@@ -84,11 +87,13 @@ class ServerThread implements Runnable{
 class Consumer implements Runnable{
 	private Buffer buffer;
 	private Vector<Socket> clients;
+	private Vector<String> usernames;
 	boolean running = true;
 	
-	public Consumer(Buffer buffer, Vector<Socket> clients){
+	public Consumer(Buffer buffer, Vector<Socket> clients, Vector<String> usernames){
 		this.buffer = buffer;	
 		this.clients = clients;
+		this.usernames = usernames;
 	}
 	
 	public void run(){
@@ -99,8 +104,8 @@ class Consumer implements Runnable{
 				for(int i = 0; i < clients.size(); i++){
 					Socket temp = clients.elementAt(i);
 					PrintWriter out = new PrintWriter(temp.getOutputStream(), true);
-					out.println(message);
-					System.out.println("Somebody said: " + message);
+					out.println(usernames.elementAt(i) + ": " + message);
+					System.out.println(usernames.elementAt(i) + ": " + message);
 				}
 				//if there is a message
 				//extract message
@@ -120,8 +125,9 @@ public class ChatServer
 		
 		Buffer buffer = new Buffer(10);
 		Vector<Socket> clients = new Vector<Socket>();
+		Vector<String> usernames = new Vector<String>();
 		
-		Thread consumer = new Thread(new Consumer(buffer, clients));
+		Thread consumer = new Thread(new Consumer(buffer, clients, usernames));
 		consumer.start();
 		try{
 			ServerSocket server = new ServerSocket(7777, 0, InetAddress.getByName(null));
@@ -129,7 +135,7 @@ public class ChatServer
 			while(running)
 			{
 				Socket clientSocket = server.accept();
-				Thread temp = new Thread(new ServerThread(clientSocket, buffer));
+				Thread temp = new Thread(new ServerThread(clientSocket, buffer, usernames));
 				temp.start();
 				clients.add(clientSocket);
 			}
