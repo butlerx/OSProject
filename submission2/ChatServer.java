@@ -62,11 +62,7 @@ class ServerThread implements Runnable{
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		}catch(IOException b){System.out.println("Error creating printwriter or bufferedreader");}
 	}
-	
-	/*public void write(String output){
-		out.println(output);
-	}*/
-	
+
 	public void run(){
 		try{
 			String user = in.readLine();
@@ -75,10 +71,12 @@ class ServerThread implements Runnable{
 			String inputLine;
 			out.println(user + " Connected");
 
+			//add the next input to the buffer
 			while ((inputLine = in.readLine()) != null) {
-				buffer.add(inputLine);
-				//if (inputLine.equals("Quit"))
-					//Thread.stop(); //break; //Shut down the Thread
+				buffer.add(user + ": " + inputLine);
+				if (inputLine.equals("Quit")){
+					//Shut down this thread, remove the socket and username
+				}
 			}
 		} catch(IOException|InterruptedException e) {System.out.println("Error running serverthread");}
 	}
@@ -100,17 +98,16 @@ class Consumer implements Runnable{
 		try{
 			while(running)
 			{
+				//if there is a message
+				//extract message
+				//for each socket, make a printwriter to send the message
 				String message = buffer.remove();
 				for(int i = 0; i < clients.size(); i++){
 					Socket temp = clients.elementAt(i);
 					PrintWriter out = new PrintWriter(temp.getOutputStream(), true);
-					out.println(usernames.elementAt(i) + ": " + message);
-					System.out.println(usernames.elementAt(i) + ": " + message);
+					out.println(message);
 				}
-				//if there is a message
-				//extract message
-				//for each thread
-				//send the message
+				System.out.println(message); //serverside record
 			}
 		}catch(InterruptedException | IOException e) {System.out.println("Error running consumer");}
 	}
@@ -120,7 +117,7 @@ public class ChatServer
 {
 	public static void main(String [] args)
 	{
-		//int portNumber = 4444; //temporary port number til I figure shit out
+		int portNumber = 7777;
 		boolean running = true;
 		
 		Buffer buffer = new Buffer(10);
@@ -130,9 +127,8 @@ public class ChatServer
 		Thread consumer = new Thread(new Consumer(buffer, clients, usernames));
 		consumer.start();
 		try{
-			ServerSocket server = new ServerSocket(7777, 0, InetAddress.getByName(null));
-			//ServerSocket server = new ServerSocket(portNumber);
-			while(running)
+			ServerSocket server = new ServerSocket(portNumber, 0, InetAddress.getByName(null));//localhost
+			while(running) //accept new connections, make a producer thread for them, remember their socket for consumer
 			{
 				Socket clientSocket = server.accept();
 				Thread temp = new Thread(new ServerThread(clientSocket, buffer, usernames));
@@ -140,7 +136,5 @@ public class ChatServer
 				clients.add(clientSocket);
 			}
 		}catch(IOException b){System.out.println("Error in main");}
-		
-		//use an arraylist
 	}
 }
