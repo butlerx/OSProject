@@ -13,12 +13,12 @@ class Buffer{
 	private int nextIn = 0;
 	private int nextOut = 0;
 	private String[] buffer;
-	
+
 	public Buffer(int size){
 		this.size = size;
 		buffer = new String[size];
 	}
-	
+
 	public synchronized void add(String data) throws InterruptedException{
 		while(!roomAvailable)
 			wait();
@@ -30,7 +30,7 @@ class Buffer{
 			roomAvailable = false;
 		notifyAll();
 	}
-	
+
 	public synchronized String remove() throws InterruptedException{
 		while(!dataAvailable)
 			wait();
@@ -52,7 +52,7 @@ class ClientReader implements Runnable{
 	private Vector<String> usernames;
 	PrintWriter out;
 	BufferedReader in;
-	
+
 	public ClientReader(Socket socket, Buffer buffer, Vector<String> usernames){ //this is a producer
 		this.socket = socket;
 		this.buffer = buffer;
@@ -74,11 +74,17 @@ class ClientReader implements Runnable{
 			//add the next input to the buffer
 			while ((inputLine = in.readLine()) != null) {
 				buffer.add(user + ": " + inputLine);
-				if (inputLine.equals("Quit")){
-					//Shut down this thread, remove the socket and username
+				if (socket.isClosed()){
+					System.out.println("ClientReader shuting down");
+					return;//Shut down this thread, remove the socket and username
 				}
 			}
-		} catch(IOException|InterruptedException e) {System.out.println("Error running ClientReader");}
+		}catch(IOException c){
+			System.out.println("ClientReader shuting down");
+			return;
+		}catch(InterruptedException e) {
+			System.out.println("Error running ClientReader");
+		}
 	}
 }
 
@@ -86,17 +92,16 @@ class ClientWriter implements Runnable{
 	private Buffer buffer;
 	private Vector<Socket> clients;
 	private Vector<String> usernames;
-	boolean running = true;
-	
+
 	public ClientWriter(Buffer buffer, Vector<Socket> clients, Vector<String> usernames){
-		this.buffer = buffer;	
+		this.buffer = buffer;
 		this.clients = clients;
 		this.usernames = usernames;
 	}
-	
+
 	public void run(){
 		try{
-			while(running)
+			while(true)
 			{
 				//if there is a message
 				//extract message
@@ -109,7 +114,12 @@ class ClientWriter implements Runnable{
 				}
 				System.out.println(message); //serverside record
 			}
-		}catch(InterruptedException | IOException e) {System.out.println("Error running ClientWriter");}
+		}catch(InterruptedException c){
+			System.out.println("ClientWriter shuting down");
+			return;
+		}catch(IOException e) {
+			System.out.println("Error running ClientWriter");
+		}
 	}
 }
 
@@ -118,23 +128,50 @@ public class ChatServer
 	public static void main(String [] args)
 	{
 		int portNumber = 7777;
-		boolean running = true;
-		
+
 		Buffer buffer = new Buffer(10);
 		Vector<Socket> clients = new Vector<Socket>();
 		Vector<String> usernames = new Vector<String>();
-		
-		Thread reader = new Thread(new ClientWriter(buffer, clients, usernames));
-		reader.start();
+		Vector<Thread> readers = new Vector<Thread>();
+
+		Thread writer = new Thread(new ClientWriter(buffer, clients, usernames));
+		writer.start();
 		try{
 			ServerSocket server = new ServerSocket(portNumber, 0, InetAddress.getByName(null));//localhost
-			while(running) //accept new connections, make a producer thread for them, remember their socket for consumer
+			while(true) //accept new connections, make a producer thread for them, remember their socket for consumer
 			{
 				Socket clientSocket = server.accept();
-				Thread temp = new Thread(new ClientReader(clientSocket, buffer, usernames));
-				temp.start();
-				clients.add(clientSocket);
+				if(clientSocket!=null){
+					//only add temp to the array if there is a socket to connect
+					Thread temp = new Thread(new ClientReader(clientSocket, buffer, usernames));
+					temp.start();
+					readers.add(temp);
+					clients.add(clientSocket);
+				}
+				for(int i = 0; i < clients.size(); i++){
+					//check to see if there are any closed clients
+					Socket checkOpen = clients.elementAt(i);
+					PrintWriter out = new PrintWriter(checkOpen.getOutputStream(), true);
+					//checking read/write streams is the most reliable way of checking connection state
+					if(out.checkError()){
+						checkOpen.close();
+						clients.remove(i);
+						usernames.remove(i);
+						(readers.elementAt(i)).interrupt();
+						(readers.elementAt(i)).join();
+						readers.remove(i);
+					}
+				}
+				if(clients.size() == 0){
+					writer.interrupt();
+					writer.join();
+				}
 			}
-		}catch(IOException b){System.out.println("Error in main");}
+		}catch(IOException b){
+			System.out.println("Error in main");
+		}catch(InterruptedException a){
+			System.out.println("Interrupt caught in main");
+		}
+		System.out.println("Goodbye");
 	}
 }
