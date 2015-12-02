@@ -81,12 +81,12 @@ class ServerThread implements Runnable{
 
 class Consumer implements Runnable{
 	private Buffer buffer;
-	private ArrayList<ServerThread> threadList;
+	private Vector clients;
 	boolean running = true;
 	
-	public Consumer(Buffer buffer, ArrayList<ServerThread> threadList){
+	public Consumer(Buffer buffer, Vector clients){
 		this.buffer = buffer;	
-		this.threadList = threadList;
+		this.clients = clients;
 	}
 	
 	public void run(){
@@ -94,14 +94,17 @@ class Consumer implements Runnable{
 			while(running)
 			{
 				String message = buffer.remove();
-				for(ServerThread thread :threadList)
-					thread.write(message);
+				for(int i = 0; i < clients.size(); i++){
+					Socket temp = (Socket)clients.elementAt(i);
+					PrintWriter out = new PrintWriter(temp.getOutputStream(), true);
+					out.println(message);
+				}
 				//if there is a message
 				//extract message
 				//for each thread
 				//send the message
 			}
-		}catch(InterruptedException e) {System.out.println("Error running consumer");}
+		}catch(InterruptedException | IOException e) {System.out.println("Error running consumer");}
 	}
 }
 
@@ -113,16 +116,22 @@ public class ChatServer
 		boolean running = true;
 		
 		Buffer buffer = new Buffer(10);
-		ArrayList<ServerThread> threadList = new ArrayList<>();
+		//ArrayList<Thread> threadList = new ArrayList<>();
+		Vector clients = new Vector();
 		
-		Thread consumer = new Thread(new Consumer(buffer, threadList)).start();
-		
-		ServerSocket server = new ServerSocket(portNumber);
-		while(running)
-		{
-			Socket clientSocket = server.accept();
-			threadList.add(new Thread(new ServerThread(clientSocket, buffer)).start());
-		}
+		Thread consumer = new Thread(new Consumer(buffer, clients));
+		consumer.start();
+		try{
+			
+			ServerSocket server = new ServerSocket(portNumber);
+			while(running)
+			{
+				Socket clientSocket = server.accept();
+				Thread temp = new Thread(new ServerThread(clientSocket, buffer));
+				temp.start();
+				clients.add(temp);
+			}
+		}catch(IOException b){System.out.println("Error in main");}
 		
 		//use an arraylist
 	}
