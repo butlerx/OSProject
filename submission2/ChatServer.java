@@ -46,14 +46,14 @@ class Buffer{
 }
 
 
-class ServerThread implements Runnable{
+class ClientReader implements Runnable{
 	private Socket socket = null;
 	private Buffer buffer;
 	private Vector<String> usernames;
 	PrintWriter out;
 	BufferedReader in;
 	
-	public ServerThread(Socket socket, Buffer buffer, Vector<String> usernames){ //this is a producer
+	public ClientReader(Socket socket, Buffer buffer, Vector<String> usernames){ //this is a producer
 		this.socket = socket;
 		this.buffer = buffer;
 		this.usernames = usernames;
@@ -78,17 +78,17 @@ class ServerThread implements Runnable{
 					//Shut down this thread, remove the socket and username
 				}
 			}
-		} catch(IOException|InterruptedException e) {System.out.println("Error running serverthread");}
+		} catch(IOException|InterruptedException e) {System.out.println("Error running ClientReader");}
 	}
 }
 
-class Consumer implements Runnable{
+class ClientWriter implements Runnable{
 	private Buffer buffer;
 	private Vector<Socket> clients;
 	private Vector<String> usernames;
 	boolean running = true;
 	
-	public Consumer(Buffer buffer, Vector<Socket> clients, Vector<String> usernames){
+	public ClientWriter(Buffer buffer, Vector<Socket> clients, Vector<String> usernames){
 		this.buffer = buffer;	
 		this.clients = clients;
 		this.usernames = usernames;
@@ -109,7 +109,7 @@ class Consumer implements Runnable{
 				}
 				System.out.println(message); //serverside record
 			}
-		}catch(InterruptedException | IOException e) {System.out.println("Error running consumer");}
+		}catch(InterruptedException | IOException e) {System.out.println("Error running ClientWriter");}
 	}
 }
 
@@ -124,14 +124,14 @@ public class ChatServer
 		Vector<Socket> clients = new Vector<Socket>();
 		Vector<String> usernames = new Vector<String>();
 		
-		Thread consumer = new Thread(new Consumer(buffer, clients, usernames));
-		consumer.start();
+		Thread reader = new Thread(new ClientWriter(buffer, clients, usernames));
+		reader.start();
 		try{
 			ServerSocket server = new ServerSocket(portNumber, 0, InetAddress.getByName(null));//localhost
 			while(running) //accept new connections, make a producer thread for them, remember their socket for consumer
 			{
 				Socket clientSocket = server.accept();
-				Thread temp = new Thread(new ServerThread(clientSocket, buffer, usernames));
+				Thread temp = new Thread(new ClientReader(clientSocket, buffer, usernames));
 				temp.start();
 				clients.add(clientSocket);
 			}
