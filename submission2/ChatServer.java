@@ -69,11 +69,16 @@ class ClientReader implements Runnable{
 			usernames.add(user);
 			System.out.println(user + " has connected.");
 			String inputLine;
-			out.println(user + " Connected");
+			buffer.add(user + " Connected");
 
 			//add the next input to the buffer
 			while ((inputLine = in.readLine()) != null) {
 				buffer.add(user + ": " + inputLine);
+				if (out.checkError()){
+					buffer.add(user + " has disconnected...");
+					System.out.println("ClientReader shuting down");
+					return;//Shut down this thread, remove the socket and username
+				}
 			}
 		}catch(IOException c){
 			System.out.println("ClientReader shuting down");
