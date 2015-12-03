@@ -1,3 +1,10 @@
+/*
+Cian butler - 13373596
+Eanna Byrne - 13763861
+Lorcan Boyle - 11411278
+Daire O'Bruachail - 13479738
+*/
+
 import java.applet.*;
 import java.awt.*;
 import java.awt.event.*;
