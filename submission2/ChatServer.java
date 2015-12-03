@@ -90,11 +90,11 @@ class ClientReader implements Runnable{
 					return;//Shut down this thread, remove the socket and username
 				}
 			}
-		}catch(IOException c){
+		}catch(InterruptedException c) {
 			System.out.println("ClientReader shuting down");
-			return;
-		}catch(InterruptedException e) {
+		}catch(IOException e){
 			System.out.println("Error running ClientReader");
+			return;
 		}
 	}
 }
@@ -134,6 +134,34 @@ class ClientWriter implements Runnable{
 	}
 }
 
+class WatchDog implements Runnable{
+	private Vector<Socket> clients;
+	private Vector<String> users;
+	private Vector<Thread> readers;
+
+	public WatchDog(Vector<Socket> c, Vector<String> u, Vector<Thread> r){
+		clients = c;
+		users = u;
+		readers = r;
+	}
+
+	public void run(){
+		try{
+			while(true){
+				for(int i = 0; i < clients.size(); i++){
+					//check to see if there are any closed clients
+				  Socket checkOpen = clients.elementAt(i);
+				  PrintWriter out = new PrintWriter(checkOpen.getOutputStream(), true);
+				  //checking read/write streams is the most reliable way of checking connection state
+				  //check if socket is still connected, close if not, and close corresponding threads
+				}
+			}
+		}catch(IOException e) {
+			System.out.println("Error running ClientWriter");
+		}
+	}
+}
+
 public class ChatServer
 {
 	public static void main(String [] args)
@@ -149,39 +177,16 @@ public class ChatServer
 		writer.start();
 		try{
 			ServerSocket server = new ServerSocket(port, 0, InetAddress.getByName(null));
-			while(true) //accept new connections, make a producer thread for them, remember their socket for consumer
+			while(true) //accept new connections, make a producer thread for them, remember their socket
 			{
 				Socket clientSocket = server.accept();
-				if(clientSocket!=null){
-					//only add temp to the array if there is a socket to connect
-					Thread temp = new Thread(new ClientReader(clientSocket, buffer, user));
-					temp.start();
-					readers.add(temp);
-					clients.add(clientSocket);
-				}
-				for(int i = 0; i < clients.size(); i++){
-					//check to see if there are any closed clients
-					Socket checkOpen = clients.elementAt(i);
-					PrintWriter out = new PrintWriter(checkOpen.getOutputStream(), true);
-					//checking read/write streams is the most reliable way of checking connection state
-					if(out.checkError()){
-						checkOpen.close();
-						clients.remove(i);
-						user.remove(i);
-						(readers.elementAt(i)).interrupt();
-						(readers.elementAt(i)).join();
-						readers.remove(i);
-					}
-				}
-				if(clients.size() == 0){
-					writer.interrupt();
-					writer.join();
-				}
+				Thread temp = new Thread(new ClientReader(clientSocket, buffer, user));
+				temp.start();
+				readers.add(temp);
+				clients.add(clientSocket);
 			}
 		}catch(IOException b){
 			System.out.println("Error in main");
-		}catch(InterruptedException a){
-			System.out.println("Interrupt caught in main");
 		}
 		System.out.println("Goodbye");
 	}
