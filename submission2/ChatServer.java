@@ -103,10 +103,10 @@ class ClientWriter implements Runnable{
 	private Vector<Socket> clients;
 	private Vector<String> usernames;
 
-	public ClientWriter(Buffer buffer, Vector<Socket> clients, Vector<String> usernames){
-		this.buffer = buffer;
-		this.clients = clients;
-		this.usernames = usernames;
+	public ClientWriter(Buffer b, Vector<Socket> c, Vector<String> u){
+		this.buffer = b;
+		this.clients = c;
+		this.usernames = u;
 	}
 
 	public void run(){
@@ -137,23 +137,23 @@ public class ChatServer
 {
 	public static void main(String [] args)
 	{
-		int portNumber = 7777;
+		int port = 7777;
 
 		Buffer buffer = new Buffer(10);
 		Vector<Socket> clients = new Vector<Socket>();
-		Vector<String> usernames = new Vector<String>();
+		Vector<String> user = new Vector<String>();
 		Vector<Thread> readers = new Vector<Thread>();
 
-		Thread writer = new Thread(new ClientWriter(buffer, clients, usernames));
+		Thread writer = new Thread(new ClientWriter(buffer, clients, user));
 		writer.start();
 		try{
-			ServerSocket server = new ServerSocket(portNumber, 0, InetAddress.getByName(null));//localhost
+			ServerSocket server = new ServerSocket(port, 0, InetAddress.getByName(null));
 			while(true) //accept new connections, make a producer thread for them, remember their socket for consumer
 			{
 				Socket clientSocket = server.accept();
 				if(clientSocket!=null){
 					//only add temp to the array if there is a socket to connect
-					Thread temp = new Thread(new ClientReader(clientSocket, buffer, usernames));
+					Thread temp = new Thread(new ClientReader(clientSocket, buffer, user));
 					temp.start();
 					readers.add(temp);
 					clients.add(clientSocket);
@@ -166,7 +166,7 @@ public class ChatServer
 					if(out.checkError()){
 						checkOpen.close();
 						clients.remove(i);
-						usernames.remove(i);
+						user.remove(i);
 						(readers.elementAt(i)).interrupt();
 						(readers.elementAt(i)).join();
 						readers.remove(i);
