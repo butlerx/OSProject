@@ -67,7 +67,9 @@ class ClientReader implements Runnable{
 		try{
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		}catch(IOException b){System.out.println("Error creating printwriter or bufferedreader");}
+		}catch(IOException b){
+			System.out.println("Error creating printwriter or bufferedreader");
+		}
 	}
 
 	public void run(){
