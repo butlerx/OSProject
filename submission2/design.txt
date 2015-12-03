@@ -2,3 +2,13 @@ Cian butler - 13373596
 Eanna Byrne - 13763861
 Lorcan Boyle - 11411278
 Daire O'Bruachail - 13479738
+
+The buffer class is used to store and distribute messages between the threads
+It contains Two methods add() and remove() which are synchronized to enforce
+mutual exclusion.
+
+the ClientReader (producer?) class will take the text input from the applet
+and insert it into the buffer to be read by the clientWriter
+
+The ClientWriter class will read from the buffer and print the message to
+each connected socket.
