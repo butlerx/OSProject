@@ -2,3 +2,6 @@ Cian butler - 13373596
 Eanna Byrne - 13763861
 Lorcan Boyle - 11411278
 Daire O'Bruachail - 13479738
+
+There are currently issues when trying to get the thread to shut down.
+The closing messages are not printed.
