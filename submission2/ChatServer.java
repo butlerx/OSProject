@@ -79,7 +79,8 @@ class ClientReader implements Runnable{
 			System.out.println(user + " has connected.");
 			String inputLine;
 			buffer.add(user + " Connected");
-
+			socket.setKeepAlive(true);
+			socket.setSoTimeout(60000);
 			//add the next input to the buffer
 			while ((inputLine = in.readLine()) != null) {
 				buffer.add(user + ": " + inputLine);
